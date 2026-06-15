@@ -24,11 +24,25 @@
  */
 
 import { config as defaultConfig } from '../config/env.js';
-import { getJson } from '../services/http.js';
+import { postJson } from '../services/http.js';
 import { localSummarizer } from './localSummarizer.js';
 
 /** Articles sent to the remote endpoint per digest. Keeps the payload bounded. */
 const REMOTE_DIGEST_LIMIT = 40;
+
+const digestInput = (article) => ({
+  id: article.id,
+  title: article.title,
+  description: article.description,
+  section: article.category,
+  source: article.sourceLabel,
+  publishedAt: article.publishedAt,
+});
+
+const isBullet = (bullet) =>
+  typeof bullet?.term === 'string' &&
+  typeof bullet.headline === 'string' &&
+  Number.isFinite(bullet.count);
 
 /**
  * Optional remote summariser.
@@ -36,6 +50,9 @@ const REMOTE_DIGEST_LIMIT = 40;
  * It posts to an endpoint *you* run (`VITE_SUMMARY_API_URL`), not straight to a
  * model vendor: a Vite build is a browser bundle, and any key put in it ships to
  * every visitor. Your endpoint holds the key and calls the model.
+ *
+ * The request carries the article text itself. Article ids are local hashes of
+ * source and URL, so an endpoint sent only ids would have nothing to summarise.
  *
  * Anything that goes wrong — no URL, non-2xx, malformed body — falls back to
  * {@link localSummarizer}, so the digest panel always renders something.
@@ -50,19 +67,17 @@ export const remoteSummarizer = {
   async summarizeFeed(articles, { config = defaultConfig, fetchImpl } = {}) {
     if (!config.summarizer.url) return localSummarizer.summarizeFeed(articles);
     try {
-      const payload = await getJson(config.summarizer.url, {
-        params: {
+      const payload = await postJson(
+        config.summarizer.url,
+        {
           model: config.summarizer.model,
-          ids: articles
-            .slice(0, REMOTE_DIGEST_LIMIT)
-            .map((a) => a.id)
-            .join(','),
+          articles: articles.slice(0, REMOTE_DIGEST_LIMIT).map(digestInput),
         },
-        timeoutMs: config.requestTimeoutMs,
-        fetchImpl,
-      });
-      if (!Array.isArray(payload?.bullets)) throw new TypeError('Digest response has no bullets');
-      return { provider: 'remote', articleCount: articles.length, bullets: payload.bullets };
+        { timeoutMs: config.requestTimeoutMs, fetchImpl }
+      );
+      const bullets = Array.isArray(payload?.bullets) ? payload.bullets.filter(isBullet) : [];
+      if (bullets.length === 0) throw new TypeError('Digest response has no usable bullets');
+      return { provider: 'remote', articleCount: articles.length, bullets };
     } catch {
       return localSummarizer.summarizeFeed(articles);
     }

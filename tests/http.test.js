@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { HttpError, buildUrl, getJson } from '../src/services/http.js';
+import { HttpError, buildUrl, getJson, postJson } from '../src/services/http.js';
 
 const okResponse = (body) => ({ ok: true, status: 200, json: async () => body });
 
@@ -77,5 +77,29 @@ describe('getJson', () => {
     const promise = getJson('https://api.test/x', { fetchImpl, signal: controller.signal });
     controller.abort();
     await expect(promise).rejects.toBeInstanceOf(HttpError);
+  });
+});
+
+describe('postJson', () => {
+  it('sends a JSON body with the matching content type', async () => {
+    const fetchImpl = vi.fn(async () => okResponse({ ok: 1 }));
+    await expect(postJson('https://api.test/digest', { a: 1 }, { fetchImpl })).resolves.toEqual({
+      ok: 1,
+    });
+    const [url, init] = fetchImpl.mock.calls[0];
+    expect(url).toBe('https://api.test/digest');
+    expect(init.method).toBe('POST');
+    expect(init.body).toBe('{"a":1}');
+    expect(init.headers).toMatchObject({
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    });
+  });
+
+  it('raises HttpError on a non-2xx answer', async () => {
+    const fetchImpl = async () => ({ ok: false, status: 422, json: async () => ({}) });
+    await expect(postJson('https://api.test/digest', {}, { fetchImpl })).rejects.toBeInstanceOf(
+      HttpError
+    );
   });
 });

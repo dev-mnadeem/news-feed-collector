@@ -31,24 +31,12 @@ export function buildUrl(baseUrl, params = {}) {
 }
 
 /**
- * GET JSON with an abort-based timeout.
- *
- * @param {string} baseUrl
- * @param {object} [options]
- * @param {Record<string, unknown>} [options.params]
- * @param {AbortSignal} [options.signal]      caller-owned cancellation
- * @param {number} [options.timeoutMs]
- * @param {typeof fetch} [options.fetchImpl]  injected in tests
+ * Fetch JSON with an abort-based timeout. `getJson` and `postJson` are the two
+ * shapes the app needs; both share the timeout and error handling here.
  */
-export async function getJson(baseUrl, options = {}) {
-  const {
-    params = {},
-    signal,
-    timeoutMs = DEFAULT_REQUEST_TIMEOUT_MS,
-    fetchImpl = globalThis.fetch,
-  } = options;
+async function requestJson(url, init, options) {
+  const { signal, timeoutMs = DEFAULT_REQUEST_TIMEOUT_MS, fetchImpl = globalThis.fetch } = options;
 
-  const url = buildUrl(baseUrl, params);
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   const onAbort = () => controller.abort();
@@ -56,8 +44,9 @@ export async function getJson(baseUrl, options = {}) {
 
   try {
     const response = await fetchImpl(url, {
+      ...init,
       signal: controller.signal,
-      headers: { Accept: 'application/json' },
+      headers: { Accept: 'application/json', ...init.headers },
     });
     if (!response.ok) {
       throw new HttpError(`Request failed with status ${response.status}`, {
@@ -76,4 +65,37 @@ export async function getJson(baseUrl, options = {}) {
     clearTimeout(timer);
     signal?.removeEventListener('abort', onAbort);
   }
+}
+
+/**
+ * GET JSON.
+ *
+ * @param {string} baseUrl
+ * @param {object} [options]
+ * @param {Record<string, unknown>} [options.params]
+ * @param {AbortSignal} [options.signal]      caller-owned cancellation
+ * @param {number} [options.timeoutMs]
+ * @param {typeof fetch} [options.fetchImpl]  injected in tests
+ */
+export function getJson(baseUrl, options = {}) {
+  return requestJson(buildUrl(baseUrl, options.params), { method: 'GET' }, options);
+}
+
+/**
+ * POST a JSON body and read JSON back. Same options as {@link getJson}, minus `params`.
+ *
+ * @param {string} url
+ * @param {unknown} body
+ * @param {object} [options]
+ */
+export function postJson(url, body, options = {}) {
+  return requestJson(
+    url,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    },
+    options
+  );
 }

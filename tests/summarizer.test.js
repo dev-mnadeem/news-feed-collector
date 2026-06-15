@@ -169,6 +169,40 @@ describe('remoteSummarizer', () => {
     expect(digest.bullets[0].term).toBe('grid');
   });
 
+  it('posts the article text, not just local ids, to the endpoint', async () => {
+    let request;
+    const fetchImpl = async (url, init) => {
+      request = { url, init };
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({ bullets: [{ term: 'grid', count: 2, headline: 'H' }] }),
+      };
+    };
+    await remoteSummarizer.summarizeFeed(corpus, { config, fetchImpl });
+    expect(request.url).toBe('https://digest.test/api');
+    expect(request.init.method).toBe('POST');
+    expect(request.init.headers['Content-Type']).toBe('application/json');
+    const body = JSON.parse(request.init.body);
+    expect(body.model).toBe(config.summarizer.model);
+    expect(body.articles).toHaveLength(2);
+    expect(body.articles[0]).toMatchObject({
+      title: 'Storage queues clear',
+      description: 'Storage projects move ahead.',
+      source: 'The Guardian',
+    });
+  });
+
+  it('falls back when every remote bullet is malformed', async () => {
+    const fetchImpl = async () => ({
+      ok: true,
+      status: 200,
+      json: async () => ({ bullets: [{ term: 3 }, 'text', null] }),
+    });
+    const digest = await remoteSummarizer.summarizeFeed(corpus, { config, fetchImpl });
+    expect(digest.provider).toBe('local');
+  });
+
   it('falls back to the local digest when the endpoint fails', async () => {
     const fetchImpl = async () => ({ ok: false, status: 500, json: async () => ({}) });
     const digest = await remoteSummarizer.summarizeFeed(corpus, { config, fetchImpl });
