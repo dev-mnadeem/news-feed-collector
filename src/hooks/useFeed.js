@@ -15,6 +15,26 @@ export const FeedStatus = {
   Error: 'error',
 };
 
+const EMPTY_FEED = {
+  filters: null,
+  appConfig: null,
+  articles: [],
+  facetArticles: [],
+  errors: [],
+  failed: false,
+};
+
+/**
+ * Status is derived rather than stored: the feed is "loading" until the first
+ * answer lands and "stale" while it still belongs to older filters.
+ */
+function feedStatus(feed, filters, appConfig) {
+  if (feed.filters === null) return FeedStatus.Loading;
+  if (feed.filters !== filters || feed.appConfig !== appConfig) return FeedStatus.Stale;
+  if (feed.failed || (feed.errors.length && feed.articles.length === 0)) return FeedStatus.Error;
+  return FeedStatus.Ready;
+}
+
 const readInitialFilters = () =>
   typeof window === 'undefined' ? emptyFilters() : filtersFromSearchParams(window.location.search);
 
@@ -27,10 +47,7 @@ const readInitialFilters = () =>
  */
 export function useFeed({ appConfig = config } = {}) {
   const [filters, setFilters] = useState(readInitialFilters);
-  const [articles, setArticles] = useState([]);
-  const [facetArticles, setFacetArticles] = useState([]);
-  const [errors, setErrors] = useState([]);
-  const [status, setStatus] = useState(FeedStatus.Loading);
+  const [feed, setFeed] = useState(EMPTY_FEED);
   const [page, setPage] = useState(1);
   const [digest, setDigest] = useState(null);
   const requestRef = useRef(0);
@@ -43,23 +60,28 @@ export function useFeed({ appConfig = config } = {}) {
     const token = requestRef.current + 1;
     requestRef.current = token;
 
-    setStatus((current) => (current === FeedStatus.Ready ? FeedStatus.Stale : FeedStatus.Loading));
-
     loadFeed({ filters, config: appConfig, signal: controller.signal })
       .then((result) => {
         if (requestRef.current !== token) return;
-        setArticles(result.articles);
-        setFacetArticles(result.facetArticles);
-        setErrors(result.errors);
-        setStatus(
-          result.errors.length && result.articles.length === 0 ? FeedStatus.Error : FeedStatus.Ready
-        );
+        setFeed({
+          filters,
+          appConfig,
+          articles: result.articles,
+          facetArticles: result.facetArticles,
+          errors: result.errors,
+          failed: false,
+        });
         setPage(1);
       })
       .catch((error) => {
         if (requestRef.current !== token) return;
-        setErrors([{ sourceId: 'app', sourceLabel: 'Feed', message: error.message }]);
-        setStatus(FeedStatus.Error);
+        setFeed((previous) => ({
+          ...previous,
+          filters,
+          appConfig,
+          errors: [{ sourceId: 'app', sourceLabel: 'Feed', message: error.message }],
+          failed: true,
+        }));
       });
 
     return () => controller.abort();
@@ -73,12 +95,11 @@ export function useFeed({ appConfig = config } = {}) {
     window.history.replaceState(null, '', next);
   }, [filters]);
 
+  const { articles, facetArticles, errors } = feed;
+
   useEffect(() => {
+    if (articles.length === 0) return undefined;
     let active = true;
-    if (articles.length === 0) {
-      setDigest(null);
-      return undefined;
-    }
     selectSummarizer(appConfig)
       .summarizeFeed(articles)
       .then((result) => {
@@ -88,6 +109,8 @@ export function useFeed({ appConfig = config } = {}) {
       active = false;
     };
   }, [articles, appConfig]);
+
+  const status = feedStatus(feed, filters, appConfig);
 
   const visible = useMemo(
     () => paginate(articles, page, appConfig.pageSize),
@@ -107,7 +130,7 @@ export function useFeed({ appConfig = config } = {}) {
     facets,
     errors,
     status,
-    digest,
+    digest: articles.length ? digest : null,
     fixtureMode,
     providers,
     hasMore: visible.length < articles.length,

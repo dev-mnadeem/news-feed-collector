@@ -69,6 +69,7 @@ describe('FeedPage', () => {
     expect(empty).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Clear all filters' }));
     await waitFor(() => expect(cards()).toHaveLength(DEFAULT_PAGE_SIZE));
+    expect(screen.getByRole('searchbox', { name: /search/i })).toHaveValue('');
   });
 
   it('restores filters from the query string on load', async () => {

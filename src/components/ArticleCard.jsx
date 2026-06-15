@@ -35,7 +35,6 @@ export default function ArticleCard({ article }) {
         <h3 className="card__title">
           <a href={article.url} target="_blank" rel="noopener noreferrer">
             {article.title}
-            <span className="visually-hidden"> (opens in a new tab)</span>
           </a>
         </h3>
         <p className="card__summary">{summary}</p>

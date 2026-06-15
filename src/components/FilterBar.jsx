@@ -17,8 +17,14 @@ const toggle = (list, value) =>
  */
 export default function FilterBar({ filters, facets, onChange, onReset }) {
   const [keywordDraft, setKeywordDraft] = useState(filters.keywords);
+  const [committedKeywords, setCommittedKeywords] = useState(filters.keywords);
 
-  useEffect(() => setKeywordDraft(filters.keywords), [filters.keywords]);
+  // When the keywords change from outside (Clear, a restored URL), the draft
+  // follows. Adjusting state during render avoids an extra effect pass.
+  if (filters.keywords !== committedKeywords) {
+    setCommittedKeywords(filters.keywords);
+    setKeywordDraft(filters.keywords);
+  }
 
   useEffect(() => {
     if (keywordDraft === filters.keywords) return undefined;

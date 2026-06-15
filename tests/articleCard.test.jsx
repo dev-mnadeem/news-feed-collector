@@ -39,9 +39,7 @@ describe('ArticleCard', () => {
     renderCard();
     const links = screen.getAllByRole('link');
     expect(links).toHaveLength(2);
-    expect(links[0]).toHaveAccessibleName(
-      'Seed bank digitises a century of germination records (opens in a new tab)'
-    );
+    expect(links[0]).toHaveAccessibleName('Seed bank digitises a century of germination records');
     expect(links[1]).toHaveAccessibleName(
       'Read at source: Seed bank digitises a century of germination records (opens in a new tab)'
     );
