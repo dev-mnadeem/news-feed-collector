@@ -1,0 +1,16 @@
+node_modules/
+dist/
+coverage/
+.vite/
+.cache/
+.eslintcache
+tmp/
+project_venv/
+.github/
+.DS_Store
+*.log
+logs/
+
+.env
+.env.*
+!.env.example

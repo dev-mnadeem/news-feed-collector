@@ -1,0 +1,15 @@
+services:
+  web:
+    build:
+      context: .
+      args:
+        VITE_NEWS_SOURCES: ${VITE_NEWS_SOURCES:-}
+        VITE_PAGE_SIZE: ${VITE_PAGE_SIZE:-12}
+    environment:
+      NEWSAPI_KEY: ${NEWSAPI_KEY:-}
+      GUARDIAN_KEY: ${GUARDIAN_KEY:-}
+      NYT_KEY: ${NYT_KEY:-}
+    ports: ["127.0.0.1:7141:8080"]
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: ["no-new-privileges:true"]
