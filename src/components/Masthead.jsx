@@ -16,6 +16,12 @@ export default function Masthead({ providers, fixtureMode, articleCount }) {
             Three newsrooms, one feed. Articles are normalised to a single shape, de-duplicated and
             sorted newest first.
           </p>
+          {fixtureMode ? (
+            <p className="masthead__sample">
+              No sources are configured, so these are fictional sample headlines from the bundled
+              fixture.
+            </p>
+          ) : null}
         </div>
         <div className="masthead__meta">
           {fixtureMode ? (

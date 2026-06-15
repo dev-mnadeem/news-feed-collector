@@ -24,6 +24,7 @@ describe('FeedPage', () => {
   it('renders a populated feed with no API keys configured', async () => {
     await renderApp();
     expect(screen.getByText('Fixture data')).toBeInTheDocument();
+    expect(screen.getByText(/fictional sample headlines/)).toBeInTheDocument();
     expect(cards()).toHaveLength(DEFAULT_PAGE_SIZE);
   });
 
@@ -57,6 +58,7 @@ describe('FeedPage', () => {
     const user = await renderApp();
     await user.type(screen.getByRole('searchbox', { name: /search/i }), 'floodplain');
     await waitFor(() => expect(screen.getByText('1 articles')).toBeInTheDocument());
+    expect(screen.getByRole('status')).toHaveTextContent('Showing 1 of 1 · 1 filter active');
     expect(cards()[0]).toHaveTextContent(/Rewilded floodplain/);
   });
 

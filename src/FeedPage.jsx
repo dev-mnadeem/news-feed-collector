@@ -14,6 +14,7 @@ import { FeedStatus, useFeed } from './hooks/useFeed.js';
 export default function FeedPage() {
   const feed = useFeed();
   const isFirstLoad = feed.status === FeedStatus.Loading;
+  const isRefreshing = feed.status === FeedStatus.Stale;
   const activeCount = activeFilterCount(feed.filters);
 
   return (
@@ -36,14 +37,19 @@ export default function FeedPage() {
 
         <SourceErrors errors={feed.errors} />
 
-        <section aria-live="polite">
+        <section aria-labelledby="feed-title" aria-busy={isFirstLoad || isRefreshing}>
           <div className="feed__head">
-            <h2 className="feed__title">Latest</h2>
-            <p className="feed__count">
+            <h2 className="feed__title" id="feed-title">
+              Latest
+            </h2>
+            <p className="feed__count" role="status">
               {isFirstLoad
                 ? 'Loading…'
                 : `Showing ${feed.visible.length} of ${feed.articles.length}`}
-              {activeCount > 0 ? ` · ${activeCount} filters active` : ''}
+              {activeCount > 0
+                ? ` · ${activeCount} ${activeCount === 1 ? 'filter' : 'filters'} active`
+                : ''}
+              {isRefreshing ? ' · updating…' : ''}
             </p>
           </div>
 

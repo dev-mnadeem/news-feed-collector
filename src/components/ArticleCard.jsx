@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { formatPublished, generatedCover } from '../domain/article.js';
 import { summarizeText } from '../ai/localSummarizer.js';
@@ -10,12 +11,21 @@ import { summarizeText } from '../ai/localSummarizer.js';
  * and picking the strongest sentence makes the grid readable.
  */
 export default function ArticleCard({ article }) {
-  const cover = article.imageUrl || generatedCover(article);
+  // A publisher's image can 404 or be hotlink-blocked; the generated cover
+  // keeps the grid even instead of showing a broken-image box.
+  const [imageFailed, setImageFailed] = useState(false);
+  const cover = article.imageUrl && !imageFailed ? article.imageUrl : generatedCover(article);
   const summary = summarizeText(article.description || article.title);
 
   return (
     <li className="card">
-      <img className="card__cover" src={cover} alt="" loading="lazy" />
+      <img
+        className="card__cover"
+        src={cover}
+        alt=""
+        loading="lazy"
+        onError={() => setImageFailed(true)}
+      />
       <div className="card__body">
         <p className="card__meta">
           <span className="card__source">{article.sourceLabel}</span>
@@ -25,13 +35,20 @@ export default function ArticleCard({ article }) {
         <h3 className="card__title">
           <a href={article.url} target="_blank" rel="noopener noreferrer">
             {article.title}
+            <span className="visually-hidden"> (opens in a new tab)</span>
           </a>
         </h3>
         <p className="card__summary">{summary}</p>
         <div className="card__foot">
           <span>{article.author || article.sourceLabel}</span>
-          <a className="card__link" href={article.url} target="_blank" rel="noopener noreferrer">
-            Read at source →
+          <a
+            className="card__link"
+            href={article.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`Read at source: ${article.title} (opens in a new tab)`}
+          >
+            Read at source <span aria-hidden="true">→</span>
           </a>
         </div>
       </div>
