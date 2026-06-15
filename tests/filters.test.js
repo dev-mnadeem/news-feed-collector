@@ -6,6 +6,7 @@ import {
   emptyFilters,
   filtersFromSearchParams,
   filtersToSearchParams,
+  isoDayOrEmpty,
   matchesFilters,
 } from '../src/domain/filters.js';
 
@@ -94,5 +95,29 @@ describe('URL round-trip', () => {
 
   it('ignores unknown query parameters', () => {
     expect(filtersFromSearchParams('?utm_source=mail')).toEqual(emptyFilters());
+  });
+
+  it('drops date bounds that are not real calendar days', () => {
+    const parsed = filtersFromSearchParams('?from=yesterday&to=2026-02-30&sources=nyt');
+    expect(parsed.from).toBe('');
+    expect(parsed.to).toBe('');
+    expect(parsed.sources).toEqual(['nyt']);
+  });
+});
+
+describe('isoDayOrEmpty', () => {
+  it('keeps a valid yyyy-mm-dd day', () => {
+    expect(isoDayOrEmpty('2026-09-27')).toBe('2026-09-27');
+  });
+
+  it.each(['', 'soon', '2026-9-7', '2026-13-01', '2026-02-30', null])('rejects %s', (value) => {
+    expect(isoDayOrEmpty(value)).toBe('');
+  });
+});
+
+describe('matchesFilters with a malformed bound', () => {
+  it('ignores the bound instead of throwing', () => {
+    expect(() => matchesFilters(article, { ...emptyFilters(), from: 'not-a-date' })).not.toThrow();
+    expect(matchesFilters(article, { ...emptyFilters(), from: 'not-a-date' })).toBe(true);
   });
 });

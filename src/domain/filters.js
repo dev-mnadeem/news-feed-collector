@@ -13,6 +13,18 @@
 
 const LIST_KEYS = ['sources', 'categories', 'authors'];
 const END_OF_DAY = 'T23:59:59.999Z';
+const ISO_DAY = /^\d{4}-\d{2}-\d{2}$/;
+
+/**
+ * Date bounds arrive from a shareable URL, so anything can be in them. A value
+ * like `from=yesterday` would make `toISOString()` throw inside the filter
+ * pass and take the whole feed down, so only real calendar days survive.
+ */
+export function isoDayOrEmpty(value) {
+  if (typeof value !== 'string' || !ISO_DAY.test(value)) return '';
+  const date = new Date(`${value}T00:00:00.000Z`);
+  return !Number.isNaN(date.getTime()) && date.toISOString().startsWith(value) ? value : '';
+}
 
 /** @returns {Filters} */
 export function emptyFilters() {
@@ -37,9 +49,11 @@ const containsKeywords = (article, keywords) => {
 const inList = (value, list) =>
   list.length === 0 || list.some((entry) => entry.toLowerCase() === value.toLowerCase());
 
-const inRange = (article, from, to) => {
+const inRange = (article, rawFrom, rawTo) => {
+  const from = isoDayOrEmpty(rawFrom);
+  const to = isoDayOrEmpty(rawTo);
   if (!article.publishedAt) return !from && !to;
-  if (from && article.publishedAt < new Date(from).toISOString()) return false;
+  if (from && article.publishedAt < `${from}T00:00:00.000Z`) return false;
   if (to && article.publishedAt > `${to}${END_OF_DAY}`) return false;
   return true;
 };
@@ -84,7 +98,7 @@ export function filtersFromSearchParams(search) {
     const value = params.get(key);
     filters[key] = value ? value.split(',').filter(Boolean) : [];
   }
-  filters.from = params.get('from') ?? '';
-  filters.to = params.get('to') ?? '';
+  filters.from = isoDayOrEmpty(params.get('from'));
+  filters.to = isoDayOrEmpty(params.get('to'));
   return filters;
 }
