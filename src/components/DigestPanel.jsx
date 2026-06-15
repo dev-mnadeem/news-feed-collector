@@ -7,7 +7,7 @@ import PropTypes from 'prop-types';
  * With no summariser endpoint configured this is produced locally and
  * deterministically — see `src/ai/localSummarizer.js`.
  */
-export default function DigestPanel({ digest }) {
+export default function DigestPanel({ digest = null }) {
   if (!digest || digest.bullets.length === 0) return null;
 
   const providerNote =
@@ -54,5 +54,3 @@ DigestPanel.propTypes = {
     ),
   }),
 };
-
-DigestPanel.defaultProps = { digest: null };

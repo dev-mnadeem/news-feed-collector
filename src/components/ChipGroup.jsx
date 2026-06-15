@@ -14,7 +14,7 @@ export default function ChipGroup({ legend, options, selected, onToggle }) {
   if (options.length === 0) return null;
 
   return (
-    <fieldset className="facet" style={{ border: 0, margin: 0, padding: 0 }}>
+    <fieldset className="facet">
       <div className="facet__head">
         <legend className="field__label">{legend}</legend>
       </div>
