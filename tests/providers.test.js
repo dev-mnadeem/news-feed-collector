@@ -263,7 +263,11 @@ describe('provider call shape', () => {
 });
 
 it('ignores legacy browser secret variables', () => {
-  const config = readConfig({ VITE_NEWSAPI_KEY: 'private', VITE_GUARDIAN_KEY: 'private', VITE_NYT_KEY: 'private' });
+  const config = readConfig({
+    VITE_NEWSAPI_KEY: 'private',
+    VITE_GUARDIAN_KEY: 'private',
+    VITE_NYT_KEY: 'private',
+  });
   expect(JSON.stringify(config)).not.toContain('private');
-  expect(resolveProviders(config).map(p => p.id)).toEqual(['fixture']);
+  expect(resolveProviders(config).map((p) => p.id)).toEqual(['fixture']);
 });
