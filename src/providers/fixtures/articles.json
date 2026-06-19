@@ -1,0 +1,218 @@
+[
+  {
+    "sourceId": "newsapi",
+    "category": "Technology",
+    "author": "Priya Raghavan",
+    "title": "Small language models move onto the phone, and the latency budget changes",
+    "description": "Running a 3B-parameter model on-device removes the round trip to a data centre. Teams that shipped it report interaction latency falling from hundreds of milliseconds to tens. The trade is memory: the model now competes with the rest of the phone for RAM, and battery cost shows up under sustained use.",
+    "url": "https://example.com/newsapi/small-language-models-on-device",
+    "publishedAt": "2026-09-27T08:15:00.000Z"
+  },
+  {
+    "sourceId": "newsapi",
+    "category": "Business",
+    "author": "Daniel Okoye",
+    "title": "Freight rates soften as new container capacity finally lands",
+    "description": "Vessels ordered during the 2021 shortage are being delivered into a market that no longer needs them. Spot rates on the main east-west lanes have fallen for six consecutive weeks. Carriers are idling ships rather than cutting prices further.",
+    "url": "https://example.com/newsapi/freight-rates-soften",
+    "publishedAt": "2026-09-27T06:40:00.000Z"
+  },
+  {
+    "sourceId": "newsapi",
+    "category": "Science",
+    "author": "Maya Lindqvist",
+    "title": "A cheaper way to measure ocean carbon uptake gets its first open dataset",
+    "description": "Autonomous floats fitted with low-cost pH sensors have returned two years of continuous readings. The dataset is being published without embargo. Researchers say the resolution is coarse but the coverage is unprecedented for the southern ocean.",
+    "url": "https://example.com/newsapi/ocean-carbon-open-dataset",
+    "publishedAt": "2026-09-26T19:05:00.000Z"
+  },
+  {
+    "sourceId": "newsapi",
+    "category": "Health",
+    "author": "Tomas Ferreira",
+    "title": "Hospitals trial scheduling software that optimises for staff rest, not throughput",
+    "description": "Four regional hospitals swapped their rota engine for one that treats consecutive night shifts as a hard constraint. Utilisation dropped by a little over two per cent. Unplanned absence dropped by considerably more, which is the number the trial was designed to move.",
+    "url": "https://example.com/newsapi/rota-software-staff-rest",
+    "publishedAt": "2026-09-26T11:20:00.000Z"
+  },
+  {
+    "sourceId": "newsapi",
+    "category": "Sports",
+    "author": "Ines Cardoso",
+    "title": "Second-tier clubs pool their analytics budgets into a shared data co-op",
+    "description": "Eleven clubs have agreed to fund a single tracking-data contract and split the feed. Each keeps its own models private. The arrangement costs each club roughly a fifth of what an individual contract would.",
+    "url": "https://example.com/newsapi/clubs-analytics-co-op",
+    "publishedAt": "2026-09-25T16:45:00.000Z"
+  },
+  {
+    "sourceId": "newsapi",
+    "category": "Entertainment",
+    "author": "Grace Whitfield",
+    "title": "Independent cinemas report their best quarter since the pandemic",
+    "description": "Repertory programming and longer runs are being credited for the recovery. Ticket volume is still below 2019 but average spend per visit is higher. Several operators have added a second screen rather than raising prices.",
+    "url": "https://example.com/newsapi/independent-cinemas-quarter",
+    "publishedAt": "2026-09-25T09:30:00.000Z"
+  },
+  {
+    "sourceId": "newsapi",
+    "category": "General",
+    "author": "Hassan Malik",
+    "title": "City transport agency publishes its timetable algorithm as open source",
+    "description": "The scheduling code that produces the published bus timetable is now readable by anyone. The agency says the move is about auditability rather than contributions. An early reading by outside engineers has already surfaced two rounding bugs in layover time.",
+    "url": "https://example.com/newsapi/timetable-algorithm-open-source",
+    "publishedAt": "2026-09-24T14:10:00.000Z"
+  },
+  {
+    "sourceId": "newsapi",
+    "category": "Technology",
+    "author": "Priya Raghavan",
+    "title": "Package registries begin signing build provenance by default",
+    "description": "Two of the largest registries now attach a signed attestation describing where a published artefact was built. Verification is opt-in for consumers. Maintainers report the change cost them a single line of CI configuration.",
+    "url": "https://example.com/newsapi/registries-sign-provenance",
+    "publishedAt": "2026-09-24T07:55:00.000Z"
+  },
+  {
+    "sourceId": "guardian",
+    "category": "Environment",
+    "author": "Eleanor Rhys",
+    "title": "Rewilded floodplain absorbs a record autumn surge without downstream damage",
+    "description": "A river restored to its original meander in 2019 held back an estimated four million cubic metres of water this month. Towns downstream saw no flooding for the first time in a decade of comparable rainfall. The scheme cost less than the concrete alternative it replaced.",
+    "url": "https://example.com/guardian/rewilded-floodplain-surge",
+    "publishedAt": "2026-09-27T10:00:00.000Z"
+  },
+  {
+    "sourceId": "guardian",
+    "category": "World News",
+    "author": "Jonas Bergström",
+    "title": "Cross-border rail link opens two years late and immediately sells out",
+    "description": "The first through-service in forty years left on time and full. Journey time falls from nine hours to four. Freight paths on the same route will not open until the second signalling phase completes.",
+    "url": "https://example.com/guardian/cross-border-rail-link",
+    "publishedAt": "2026-09-26T21:30:00.000Z"
+  },
+  {
+    "sourceId": "guardian",
+    "category": "Tech",
+    "author": "Aisha Bello",
+    "title": "Regulators ask streaming platforms to publish recommendation weightings",
+    "description": "A draft code would require large platforms to disclose, in plain language, what their feed optimises for. Platforms argue the weightings change daily and a snapshot would mislead. The consultation closes in November.",
+    "url": "https://example.com/guardian/recommendation-weightings",
+    "publishedAt": "2026-09-26T13:15:00.000Z"
+  },
+  {
+    "sourceId": "guardian",
+    "category": "Business",
+    "author": "Marcus Deane",
+    "title": "Retail energy suppliers shift to half-hourly settlement, and tariffs follow",
+    "description": "Households on smart meters are being offered tariffs that reprice every thirty minutes. Early adopters with flexible loads report meaningful savings. Consumer groups warn the same structure penalises anyone whose demand cannot move.",
+    "url": "https://example.com/guardian/half-hourly-settlement",
+    "publishedAt": "2026-09-25T18:00:00.000Z"
+  },
+  {
+    "sourceId": "guardian",
+    "category": "Science",
+    "author": "Eleanor Rhys",
+    "title": "Seed bank digitises a century of germination records",
+    "description": "Handwritten germination logs going back to 1921 have been transcribed and released as structured data. The archive covers more than sixty thousand accessions. Early analysis suggests viability windows for several wild relatives are shorter than the published guidance assumes.",
+    "url": "https://example.com/guardian/seed-bank-digitised",
+    "publishedAt": "2026-09-25T08:25:00.000Z"
+  },
+  {
+    "sourceId": "guardian",
+    "category": "Football",
+    "author": "Ruaridh Kane",
+    "title": "Lower-league attendances climb where clubs froze ticket prices",
+    "description": "Sixteen clubs held season-ticket prices flat for a third year. Their combined attendance is up nine per cent on last season. Matchday revenue per head is broadly unchanged, with the gain coming from volume.",
+    "url": "https://example.com/guardian/attendances-frozen-prices",
+    "publishedAt": "2026-09-24T17:40:00.000Z"
+  },
+  {
+    "sourceId": "guardian",
+    "category": "UK News",
+    "author": "Marcus Deane",
+    "title": "Councils publish planning decisions as machine-readable records",
+    "description": "Thirty-one authorities have adopted a shared schema for planning applications and outcomes. Researchers can now compare decision times across boundaries without scraping PDFs. Coverage is still patchy outside the participating authorities.",
+    "url": "https://example.com/guardian/planning-decisions-machine-readable",
+    "publishedAt": "2026-09-23T12:05:00.000Z"
+  },
+  {
+    "sourceId": "guardian",
+    "category": "Global Development",
+    "author": "Aisha Bello",
+    "title": "Mobile clinics cut diagnostic turnaround from weeks to a single visit",
+    "description": "Portable analysers deployed across rural districts return results while the patient waits. Referral rates rose, which the programme treats as the intended effect. The limiting factor is now transport, not laboratory capacity.",
+    "url": "https://example.com/guardian/mobile-clinics-turnaround",
+    "publishedAt": "2026-09-23T06:50:00.000Z"
+  },
+  {
+    "sourceId": "nyt",
+    "category": "U.S.",
+    "author": "Caroline Whitaker",
+    "title": "States converge on a common standard for utility outage reporting",
+    "description": "Nine state regulators have adopted an identical reporting format for outage duration and cause. Comparable data across states did not previously exist. The first joint report is expected in the spring.",
+    "url": "https://example.com/nyt/outage-reporting-standard",
+    "publishedAt": "2026-09-27T12:30:00.000Z"
+  },
+  {
+    "sourceId": "nyt",
+    "category": "Business",
+    "author": "Victor Amaro",
+    "title": "Long-duration storage projects clear interconnection queues ahead of schedule",
+    "description": "Queue reform that prioritised projects with signed offtake has started to bite. Several multi-hour storage sites moved from study to construction in under a year. Developers still describe permitting, not interconnection, as the binding constraint.",
+    "url": "https://example.com/nyt/storage-interconnection-queues",
+    "publishedAt": "2026-09-26T16:10:00.000Z"
+  },
+  {
+    "sourceId": "nyt",
+    "category": "Tech",
+    "author": "Naomi Sturges",
+    "title": "Browser vendors agree a shared test suite for privacy-preserving measurement",
+    "description": "The suite covers aggregation, noise and reporting delays. Agreement on tests came faster than agreement on the underlying API. Implementations that fail the suite will not ship the feature by default.",
+    "url": "https://example.com/nyt/privacy-measurement-test-suite",
+    "publishedAt": "2026-09-26T09:45:00.000Z"
+  },
+  {
+    "sourceId": "nyt",
+    "category": "Science",
+    "author": "Naomi Sturges",
+    "title": "A twenty-year soil survey finds carbon gains where tillage stopped",
+    "description": "Fields under continuous no-till since 2006 hold measurably more carbon in the top thirty centimetres. Below that depth the difference disappears. The authors caution that the result does not transfer to soils with different clay content.",
+    "url": "https://example.com/nyt/soil-survey-no-till",
+    "publishedAt": "2026-09-25T14:20:00.000Z"
+  },
+  {
+    "sourceId": "nyt",
+    "category": "Politics",
+    "author": "Caroline Whitaker",
+    "title": "Redistricting commissions publish their own map-scoring code",
+    "description": "Four commissions released the software used to score compactness and competitiveness. Outside analysts reproduced the published scores within days. Two commissions have since corrected a metric that double-counted water boundaries.",
+    "url": "https://example.com/nyt/map-scoring-code",
+    "publishedAt": "2026-09-25T07:00:00.000Z"
+  },
+  {
+    "sourceId": "nyt",
+    "category": "Health",
+    "author": "Victor Amaro",
+    "title": "Pharmacies take on chronic-condition monitoring as clinics run long waits",
+    "description": "Community pharmacies in several states can now run and bill for routine monitoring. Early data shows shorter intervals between checks. Physician groups have asked for a shared record rather than parallel ones.",
+    "url": "https://example.com/nyt/pharmacy-chronic-monitoring",
+    "publishedAt": "2026-09-24T11:35:00.000Z"
+  },
+  {
+    "sourceId": "nyt",
+    "category": "N.Y.",
+    "author": "Owen Brightman",
+    "title": "Subway accessibility work finishes ahead of the revised timetable",
+    "description": "Elevators at eleven stations opened this month. The programme is still years behind its original plan but has beaten every revised date since 2024. Remaining stations are the ones with the hardest structural constraints.",
+    "url": "https://example.com/nyt/subway-accessibility-work",
+    "publishedAt": "2026-09-23T15:55:00.000Z"
+  },
+  {
+    "sourceId": "nyt",
+    "category": "Education",
+    "author": "Owen Brightman",
+    "title": "Districts that kept librarians report the smallest reading declines",
+    "description": "A multi-district analysis compared reading outcomes against staffing changes since 2019. Districts that retained full-time librarians show the shallowest decline. The authors are explicit that the study cannot separate this from wider funding effects.",
+    "url": "https://example.com/nyt/librarians-reading-declines",
+    "publishedAt": "2026-09-22T10:15:00.000Z"
+  }
+]
