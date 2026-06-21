@@ -1,0 +1,30 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # Empty by default. Supply keys here (or via a .env file) to build a
+        # bundle that talks to the live APIs instead of the bundled fixture.
+        VITE_NEWSAPI_KEY: ${VITE_NEWSAPI_KEY:-}
+        VITE_GUARDIAN_KEY: ${VITE_GUARDIAN_KEY:-}
+        VITE_NYT_KEY: ${VITE_NYT_KEY:-}
+        VITE_NEWS_SOURCES: ${VITE_NEWS_SOURCES:-}
+        VITE_PAGE_SIZE: ${VITE_PAGE_SIZE:-}
+    image: news-feed-collector:latest
+    ports:
+      - "7141:8080"
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/cache/nginx
+      - /var/run
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
