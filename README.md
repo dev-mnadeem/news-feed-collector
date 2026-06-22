@@ -16,18 +16,23 @@ rather than an empty grid and a console error.
 ## Running it
 
 ```bash
-npm install
+npm ci
 npm run dev          # http://localhost:7141
 ```
 
-That is the whole setup. To point it at the live APIs instead, copy the sample env file and fill in
-whichever keys you have — one is enough:
+Use Node 22. Fixture mode needs only the Vite process. For live sources, put keys in the
+server environment and enable the matching public source IDs:
 
 ```bash
 cp .env.example .env.local
-# set VITE_NEWSAPI_KEY / VITE_GUARDIAN_KEY / VITE_NYT_KEY
-npm run dev
+# set NEWSAPI_KEY / GUARDIAN_KEY / NYT_KEY; never prefix secrets with VITE_
+# set VITE_NEWS_SOURCES=guardian,nyt (only sources with configured server keys)
+npm run server       # terminal 1: loopback proxy on port 7150
+npm run dev          # terminal 2: Vite forwards /api/news to the proxy
 ```
+
+For a production-style local run, build with `npm run build`, start `npm run server`,
+and open http://127.0.0.1:7150. The Node server serves both `dist/` and the proxy.
 
 Other scripts: `npm test`, `npm run lint`, `npm run build`, `npm run preview`.
 
@@ -44,8 +49,7 @@ Each source is a module in `src/providers/` satisfying one interface (`src/provi
 | The New York Times | `nyt` | yes | keywords, date range, categories, byline |
 | Local fixture | `fixture` | no | nothing — returns all 24 |
 
-`resolveProviders()` picks the set to use: whatever `VITE_NEWS_SOURCES` names, else every provider
-whose key is present, else the fixture. Nothing above the registry knows which branch was taken —
+`resolveProviders()` picks the set to use: whatever `VITE_NEWS_SOURCES` names, otherwise the fixture. Nothing above the registry knows which branch was taken —
 the UI just receives `Article[]`.
 
 Because the three upstream APIs support *different* filters, narrowing happens twice: each provider
@@ -65,11 +69,13 @@ flowchart TB
         FX["fixtureProvider<br/>24 checked-in articles"]
     end
 
-    REG{"resolveProviders<br/>any API key set?"}
+    REG{"resolveProviders<br/>live source IDs enabled?"}
     REG -- "yes" --> NA & GU & NY
     REG -- "no" --> FX
 
-    NA & GU & NY & FX --> NORM["createArticle<br/>one Article shape"]
+    NA & GU & NY --> PROXY["Same-origin proxy: fixed upstreams, server-held keys"]
+    PROXY --> NORM
+    FX --> NORM["createArticle<br/>one Article shape"]
     NORM --> FOLD["Promise.allSettled<br/>failures collected, not thrown"]
     FOLD --> DEDUPE["dedupe by source+url,<br/>sort newest first"]
     DEDUPE --> FACETS["collectFacets<br/>source / section / byline options"]
@@ -139,13 +145,13 @@ reload, or toggling a chip off and on again, costs nothing against a rate-limite
 
 ## Configuration
 
-Every environment-derived value is read in `src/config/env.js` and nowhere else, so tests can build
+Browser configuration is read in `src/config/env.js`; server secrets are read only by `server/index.js`, so tests can build
 a config object and hand it to the registry without touching globals. Full list with comments in
 [`.env.example`](.env.example); the ones you are most likely to touch:
 
 | Variable | Default | Purpose |
 |---|---|---|
-| `VITE_NEWSAPI_KEY` / `VITE_GUARDIAN_KEY` / `VITE_NYT_KEY` | empty | enable a live source |
+| `NEWSAPI_KEY` / `GUARDIAN_KEY` / `NYT_KEY` | empty | server-only provider credentials |
 | `VITE_NEWS_SOURCES` | empty | explicit allow-list, e.g. `guardian,nyt` or `fixture` |
 | `VITE_PAGE_SIZE` | `12` | articles per page before "Load more" |
 | `VITE_REQUEST_TIMEOUT_MS` | `8000` | per-request abort deadline |
@@ -161,7 +167,7 @@ Malformed numeric values fall back to the default rather than becoming `NaN`.
 $ npm test
 
  Test Files  8 passed (8)
-      Tests  109 passed (109)
+      Tests  110 passed (110)
 ```
 
 Vitest with jsdom. The suite covers the domain helpers, the HTTP layer (timeout, abort, non-2xx,
@@ -169,6 +175,9 @@ query building), each provider's wire-format mapping — including both shapes N
 `multimedia` — registry resolution, the fan-out and its partial-failure and cache behaviour, the
 summariser and its fallbacks, and an integration pass over the rendered app in
 `tests/feedPage.test.jsx`.
+
+`npm run test:server` adds three native HTTP tests for server-held credentials,
+parameter allowlisting, sanitized failures and oversized responses.
 
 Those integration tests run with no environment variables set, which is the same state a fresh
 clone is in, so they also assert that the app is usable with no API keys.
@@ -184,25 +193,23 @@ warnings.
 docker compose up --build       # http://localhost:7141
 ```
 
-Multi-stage: `node:22-alpine` builds the bundle, `nginxinc/nginx-unprivileged` serves `dist/` as
-uid 101 on port 8080, with a read-only root filesystem, `no-new-privileges`, and tmpfs mounts for
-the paths nginx needs to write. The nginx config caches hashed assets for a year and marks
-`index.html` `no-store`.
+Node 22 builds the frontend, then a non-root Node runtime serves the built files and proxy.
+Only source IDs/page size are build arguments. Provider keys are runtime environment variables,
+so they do not enter the browser bundle or image build layers. Copy `.env.example` to `.env`
+for Compose interpolation, or export the variables before running Compose.
 
-Because Vite inlines `VITE_*` at build time, keys are **build args**, not runtime environment. With
-none supplied the image builds a fixture-mode bundle and still serves a populated feed.
-
-> `docker compose config` parses cleanly. The image build and container boot have **not** been run
-> in this environment — Docker was unavailable.
+Container startup was not exercised because the local Docker daemon was unavailable.
+Native build, UI tests and actual local proxy HTTP tests were exercised instead.
 
 ---
 
 ## What this does not do
 
-- **No server.** It is a static bundle that calls the news APIs from the browser. That means the
-  keys are in the bundle, which is fine for a public demo key and wrong for anything else — a real
-  deployment wants a thin proxy holding the keys, and the provider interface is the seam where that
-  would slot in.
+- **The proxy is a local demonstration boundary.** Fixed upstream destinations, accepted query
+  fields, an eight-second deadline, 2 MB response cap, and a process-wide 60 requests/minute
+  limit bound requests. Errors omit upstream URLs and credentials. Before public deployment,
+  add authentication, per-user quotas and shared rate limiting; multiple instances do not
+  share this in-memory budget.
 - **One page of upstream results per source.** NewsAPI and the Guardian are asked for 40 articles
   each; NYT returns whatever its default page holds. The feed then paginates client-side over the
   merged set — no cursor is plumbed through to the upstream APIs, so "Load more" cannot reach page
@@ -211,3 +218,7 @@ none supplied the image builds a fixture-mode bundle and still serves a populate
 - **Sections are not reconciled across sources.** The Guardian's "Tech" and NYT's "Tech" merge by
   luck of naming; NewsAPI reports its originating outlet in the same field. A source-to-canonical
   section map would fix it.
+
+## Author
+
+[**Muhammad Nadeem**](https://github.com/dev-mnadeem)

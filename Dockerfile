@@ -1,30 +1,19 @@
-# syntax=docker/dockerfile:1
-
-# ---- build -----------------------------------------------------------------
-# Vite inlines VITE_* values at build time, so the keys are build args, not
-# runtime env. With none supplied the bundle falls back to the local fixture
-# provider and the container still serves a populated feed.
 FROM node:22-alpine AS build
 WORKDIR /app
-
 COPY package.json package-lock.json ./
-RUN npm ci
-
+RUN npm ci --ignore-scripts
 COPY . .
-
-ARG VITE_NEWSAPI_KEY=""
-ARG VITE_GUARDIAN_KEY=""
-ARG VITE_NYT_KEY=""
 ARG VITE_NEWS_SOURCES=""
-ARG VITE_PAGE_SIZE=""
+ARG VITE_PAGE_SIZE="12"
 RUN npm run build
 
-# ---- runtime ---------------------------------------------------------------
-# nginx-unprivileged runs as uid 101 and binds 8080, so nothing here needs root.
-FROM nginxinc/nginx-unprivileged:1.27-alpine AS runtime
-USER 101
-COPY --from=build /app/dist /usr/share/nginx/html
-COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
+FROM node:22-alpine AS runtime
+WORKDIR /app
+ENV NODE_ENV=production HOST=0.0.0.0 PORT=8080
+COPY --from=build --chown=node:node /app/dist ./dist
+COPY --chown=node:node server ./server
+COPY package.json ./
+USER node
 EXPOSE 8080
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD wget -q -O /dev/null http://127.0.0.1:8080/ || exit 1
+HEALTHCHECK --interval=30s --timeout=3s CMD node -e "fetch('http://127.0.0.1:8080/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+CMD ["node", "server/index.js"]

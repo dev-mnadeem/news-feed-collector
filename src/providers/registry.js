@@ -20,7 +20,7 @@ export function getProvider(id) {
  * Decide which providers this run should use.
  *
  * - `VITE_NEWS_SOURCES` set  -> exactly those ids, in that order (explicit wins)
- * - otherwise                -> every provider whose key is present
+ * - otherwise                -> providers explicitly enabled for the server proxy
  * - nothing configured       -> the local fixture, so the app still renders
  *
  * That last branch is the whole reason a fresh clone shows a populated feed

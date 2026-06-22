@@ -19,9 +19,7 @@ const jsonFetch = (body) => {
 };
 
 const baseConfig = readConfig({
-  VITE_NEWSAPI_KEY: 'na-key',
-  VITE_GUARDIAN_KEY: 'gu-key',
-  VITE_NYT_KEY: 'ny-key',
+  VITE_NEWS_SOURCES: 'newsapi,guardian,nyt',
 });
 
 describe('query helpers', () => {
@@ -88,14 +86,15 @@ describe('newsApiProvider', () => {
     expect(article.publishedAt).toBe('2026-09-27T08:15:00.000Z');
   });
 
-  it('sends the key and the date bounds as query params', async () => {
+  it('sends date bounds to the proxy without a provider key', async () => {
     const { fetchImpl, calls } = jsonFetch({ articles: [] });
     await newsApiProvider.fetchArticles({
       filters: { ...emptyFilters(), from: '2026-09-01', to: '2026-09-30' },
       config: baseConfig,
       fetchImpl,
     });
-    expect(calls[0]).toContain('apiKey=na-key');
+    expect(calls[0]).toMatch(/^\/api\/news\/newsapi\?/);
+    expect(calls[0]).not.toContain('apiKey');
     expect(calls[0]).toContain('from=2026-09-01');
     expect(calls[0]).toContain('to=2026-09-30');
   });
@@ -212,12 +211,12 @@ describe('resolveProviders', () => {
     expect(isFixtureMode(providers)).toBe(true);
   });
 
-  it('auto-detects every provider whose key is present', () => {
+  it('uses the explicitly enabled proxy sources', () => {
     expect(resolveProviders(baseConfig).map((p) => p.id)).toEqual(['newsapi', 'guardian', 'nyt']);
   });
 
-  it('uses only the keys that exist', () => {
-    const config = readConfig({ VITE_GUARDIAN_KEY: 'gu-key' });
+  it('uses only the explicitly enabled source', () => {
+    const config = readConfig({ VITE_NEWS_SOURCES: 'guardian' });
     expect(resolveProviders(config).map((p) => p.id)).toEqual(['guardian']);
   });
 
@@ -261,4 +260,10 @@ describe('provider call shape', () => {
     });
     expect(fetchImpl.mock.calls[0][1].signal).toBeInstanceOf(AbortSignal);
   });
+});
+
+it('ignores legacy browser secret variables', () => {
+  const config = readConfig({ VITE_NEWSAPI_KEY: 'private', VITE_GUARDIAN_KEY: 'private', VITE_NYT_KEY: 'private' });
+  expect(JSON.stringify(config)).not.toContain('private');
+  expect(resolveProviders(config).map(p => p.id)).toEqual(['fixture']);
 });

@@ -10,10 +10,10 @@ export const newsApiProvider = {
   label: LABEL,
   requiresKey: true,
   supports: { keywords: true, dateRange: true, categories: true, authors: false },
-  isConfigured: (config) => Boolean(config.newsapi.key),
+  isConfigured: (config) => config.enabledSources.includes('newsapi'),
 
   async fetchArticles({ filters, config, signal, fetchImpl }) {
-    const payload = await getJson(`${config.newsapi.baseUrl}/everything`, {
+    const payload = await getJson(config.newsapi.baseUrl, {
       params: {
         q: queryTerm(filters),
         from: filters.from,
@@ -21,7 +21,6 @@ export const newsApiProvider = {
         language: 'en',
         sortBy: 'publishedAt',
         pageSize: UPSTREAM_PAGE_SIZE,
-        apiKey: config.newsapi.key,
       },
       signal,
       fetchImpl,

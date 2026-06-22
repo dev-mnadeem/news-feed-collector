@@ -22,7 +22,7 @@ export const nytProvider = {
   label: LABEL,
   requiresKey: true,
   supports: { keywords: true, dateRange: true, categories: true, authors: true },
-  isConfigured: (config) => Boolean(config.nyt.key),
+  isConfigured: (config) => config.enabledSources.includes('nyt'),
 
   async fetchArticles({ filters, config, signal, fetchImpl }) {
     const authorClause = filters.authors.length
@@ -36,7 +36,6 @@ export const nytProvider = {
         end_date: compactDate(filters.to),
         sort: 'newest',
         fq: authorClause,
-        'api-key': config.nyt.key,
       },
       signal,
       fetchImpl,

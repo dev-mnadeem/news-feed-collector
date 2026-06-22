@@ -10,7 +10,7 @@ export const guardianProvider = {
   label: LABEL,
   requiresKey: true,
   supports: { keywords: true, dateRange: true, categories: true, authors: false },
-  isConfigured: (config) => Boolean(config.guardian.key),
+  isConfigured: (config) => config.enabledSources.includes('guardian'),
 
   async fetchArticles({ filters, config, signal, fetchImpl }) {
     const payload = await getJson(config.guardian.baseUrl, {
@@ -21,7 +21,6 @@ export const guardianProvider = {
         'show-fields': 'trailText,thumbnail,byline',
         'page-size': UPSTREAM_PAGE_SIZE,
         'order-by': 'newest',
-        'api-key': config.guardian.key,
       },
       signal,
       fetchImpl,

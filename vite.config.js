@@ -6,7 +6,7 @@ const DEV_PORT = 7141;
 
 export default defineConfig({
   plugins: [react()],
-  server: { port: DEV_PORT, strictPort: true },
+  server: { port: DEV_PORT, strictPort: true, proxy: { '/api/news': 'http://127.0.0.1:7150' } },
   preview: { port: DEV_PORT, strictPort: true },
   build: { outDir: 'dist', sourcemap: true },
   test: {

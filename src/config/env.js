@@ -32,9 +32,9 @@ const csv = (value) =>
 
 /**
  * @typedef {object} AppConfig
- * @property {{key: string, baseUrl: string}} newsapi
- * @property {{key: string, baseUrl: string}} guardian
- * @property {{key: string, baseUrl: string}} nyt
+ * @property {{baseUrl: string}} newsapi
+ * @property {{baseUrl: string}} guardian
+ * @property {{baseUrl: string}} nyt
  * @property {string[]} enabledSources  explicit allow-list, empty means "auto-detect"
  * @property {number} pageSize
  * @property {number} requestTimeoutMs
@@ -44,20 +44,9 @@ const csv = (value) =>
 /** @returns {AppConfig} */
 export function readConfig(source = raw) {
   return {
-    newsapi: {
-      key: trimmed(source.VITE_NEWSAPI_KEY),
-      baseUrl: trimmed(source.VITE_NEWSAPI_BASE_URL) || 'https://newsapi.org/v2',
-    },
-    guardian: {
-      key: trimmed(source.VITE_GUARDIAN_KEY),
-      baseUrl: trimmed(source.VITE_GUARDIAN_BASE_URL) || 'https://content.guardianapis.com/search',
-    },
-    nyt: {
-      key: trimmed(source.VITE_NYT_KEY),
-      baseUrl:
-        trimmed(source.VITE_NYT_BASE_URL) ||
-        'https://api.nytimes.com/svc/search/v2/articlesearch.json',
-    },
+    newsapi: { baseUrl: '/api/news/newsapi' },
+    guardian: { baseUrl: '/api/news/guardian' },
+    nyt: { baseUrl: '/api/news/nyt' },
     enabledSources: csv(source.VITE_NEWS_SOURCES),
     pageSize: positiveInt(source.VITE_PAGE_SIZE, DEFAULT_PAGE_SIZE),
     requestTimeoutMs: positiveInt(source.VITE_REQUEST_TIMEOUT_MS, DEFAULT_REQUEST_TIMEOUT_MS),
